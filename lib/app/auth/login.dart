@@ -2,6 +2,7 @@ import 'package:course_getx/components/crud.dart';
 import 'package:course_getx/components/customtextform.dart';
 import 'package:course_getx/components/valid.dart';
 import 'package:course_getx/constant/linkapi.dart';
+import 'package:course_getx/main.dart';
 import 'package:flutter/material.dart';
 
 class Login extends StatefulWidget {
@@ -18,13 +19,45 @@ class _LoginState extends State<Login> {
   Crud crud = Crud();
   login() async {
     if (formstate.currentState!.validate()) {
-      var response = await crud.postRequest(linkLogin, {
-        "email": email.text,
-        "password": password.text,
-      });
-      if (response['status'] == "success") {
+      try {
+        var response = await crud.postRequest(linkLogin, {
+          "email": email.text,
+          "password": password.text,
+        });
+
+        // ignore: avoid_print
+        print("Login response: $response"); // للتصحيح
+
+        if (response != null && response is Map) {
+          if (response['status'] == "success") {
+            sharedPref.setString("id", response['data']['id'].toString());
+            sharedPref.setString("usersname", response['data']['usersname']);
+            sharedPref.setString("email", response['data']['email']);
+
+            // ignore: use_build_context_synchronously
+            Navigator.of(
+              // ignore: use_build_context_synchronously
+              context,
+            ).pushNamedAndRemoveUntil("home", (route) => false);
+          } else {
+            // ignore: use_build_context_synchronously
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(response['message'] ?? "Login failed")),
+            );
+          }
+        } else {
+          // ignore: use_build_context_synchronously
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Unexpected response from server")),
+          );
+        }
+      } catch (e) {
+        // ignore: avoid_print
+        print("Login error: $e");
         // ignore: use_build_context_synchronously
-        Navigator.of(context).pushNamedAndRemoveUntil("home", (route) => false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Something went wrong, please try again.")),
+        );
       }
     }
   }

@@ -13,6 +13,7 @@ class SignUp extends StatefulWidget {
 
 class _SignUpState extends State<SignUp> {
   GlobalKey<FormState> formstate = GlobalKey();
+
   // ignore: prefer_final_fields
   Crud _crud = Crud();
 
@@ -22,20 +23,33 @@ class _SignUpState extends State<SignUp> {
 
   signUp() async {
     if (formstate.currentState!.validate()) {
-      var response = await _crud.postRequest(linkSignUp, {
-        "usersname": usersname.text,
-        "email": email.text,
-        "password": password.text,
-      });
-      if (response['status'] == "success") {
-        // ignore: use_build_context_synchronously
-        Navigator.of(
+      try {
+        var response = await _crud.postRequest(linkSignUp, {
+          "usersname": usersname.text,
+          "email": email.text,
+          "password": password.text,
+        });
+
+        if (response['status'] == "success") {
           // ignore: use_build_context_synchronously
-          context,
-        ).pushNamedAndRemoveUntil("success", (route) => false);
-      } else {
+          Navigator.of(
+            // ignore: use_build_context_synchronously
+            context,
+          ).pushNamedAndRemoveUntil("success", (route) => false);
+        } else {
+          // ignore: avoid_print
+          print("Signup Fail: ${response['message'] ?? 'Unknown error'}");
+        }
+      } catch (e) {
+        // التعامل مع أي خطأ يحصل (انقطاع الإنترنت، خطأ في السيرفر، إلخ)
         // ignore: avoid_print
-        print("Signup Fail");
+        print("Error during signup: $e");
+
+        // ممكن تستخدم Snackbar أو Dialog بدال print
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Something went wrong, please try again.")),
+        );
       }
     }
   }

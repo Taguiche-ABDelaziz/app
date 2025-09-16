@@ -3,8 +3,12 @@ import 'package:course_getx/app/auth/signup.dart';
 import 'package:course_getx/app/auth/success.dart';
 import 'package:course_getx/app/home.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
+late SharedPreferences sharedPref;
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  sharedPref = await SharedPreferences.getInstance();
   runApp(const MyApp());
 }
 
@@ -17,7 +21,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Course PHP Rest API',
-      initialRoute: "login",
+      initialRoute: sharedPref.getString("id") == null ? "login" : "home",
       routes: {
         "login": (context) => Login(),
         "signup": (context) => SignUp(),
