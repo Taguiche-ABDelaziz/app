@@ -1,3 +1,5 @@
+import 'package:course_getx/app/model/notemodel.dart';
+import 'package:course_getx/app/notes/edit.dart';
 import 'package:course_getx/components/cardnote.dart';
 import 'package:course_getx/components/crud.dart';
 import 'package:course_getx/constant/linkapi.dart';
@@ -38,6 +40,12 @@ class _LoginState extends State<Home> {
           ),
         ],
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.of(context).pushNamed("addNotes");
+        },
+        child: Icon(Icons.add),
+      ),
       body: ListView(
         padding: const EdgeInsets.all(10),
         children: [
@@ -62,9 +70,26 @@ class _LoginState extends State<Home> {
                   physics: NeverScrollableScrollPhysics(),
                   itemBuilder: (context, i) {
                     return CardNotes(
-                      ontap: () {},
-                      title: "${snapshot.data['data'][i]['notes_title']}",
-                      content: "${snapshot.data['data'][i]['notes_content']}",
+                      onDelete: () async {
+                        var response = await crud.postRequest(linkDeleteNotes, {
+                          "id": snapshot.data['data'][i]['notes_id'].toString(),
+                          "imagename": snapshot.data['data'][i]['notes_image']
+                              .toString(),
+                        });
+                        if (response['status'] == "success") {
+                          // ignore: use_build_context_synchronously
+                          Navigator.of(context).pushReplacementNamed("home");
+                        }
+                      },
+                      ontap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                EditNotes(notes: snapshot.data['data'][i]),
+                          ),
+                        );
+                      },
+                      notemodel: NoteMode.fromJson(snapshot.data['data'][i]),
                     );
                   },
                 );

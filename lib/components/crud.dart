@@ -1,5 +1,12 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:http/http.dart' as http;
+// ignore: depend_on_referenced_packages
+import 'package:path/path.dart';
+
+String _basicAuth = 'Basic ${base64Encode(utf8.encode('wael:wael12345'))}';
+
+Map<String, String> myheaders = {'authorization': _basicAuth};
 
 class Crud {
   // GET request
@@ -24,7 +31,11 @@ class Crud {
   // POST request
   postRequest(String url, Map data) async {
     try {
-      var response = await http.post(Uri.parse(url), body: data);
+      var response = await http.post(
+        Uri.parse(url),
+        body: data,
+        headers: myheaders,
+      );
       if (response.statusCode == 200) {
         var responsebody = jsonDecode(response.body);
         return responsebody;
@@ -35,6 +46,33 @@ class Crud {
     } catch (e) {
       // ignore: avoid_print
       print("Catch Error: $e");
+    }
+  }
+
+  postRequestWithFile(String url, Map data, File file) async {
+    var request = http.MultipartRequest("POST", Uri.parse(url));
+    var length = await file.length();
+    var stream = http.ByteStream(file.openRead());
+    var multipartFile = http.MultipartFile(
+      "file",
+      stream,
+      length,
+      filename: basename(file.path),
+    );
+    request.headers.addAll(myheaders);
+    request.files.add(multipartFile);
+    data.forEach((key, value) {
+      request.fields[key] = value;
+    });
+    var myrequest = await request.send();
+
+    var response = await http.Response.fromStream(myrequest);
+
+    if (myrequest.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      // ignore: avoid_print
+      print("Error  ${myrequest.statusCode}");
     }
   }
 }

@@ -2,6 +2,8 @@ import 'package:course_getx/app/auth/login.dart';
 import 'package:course_getx/app/auth/signup.dart';
 import 'package:course_getx/app/auth/success.dart';
 import 'package:course_getx/app/home.dart';
+import 'package:course_getx/app/notes/add.dart';
+import 'package:course_getx/app/notes/edit.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -27,6 +29,8 @@ class MyApp extends StatelessWidget {
         "signup": (context) => SignUp(),
         "home": (context) => Home(),
         "success": (context) => Success(),
+        "addNotes": (context) => AddNotes(),
+        "editNotes": (context) => EditNotes(),
       },
     );
   }

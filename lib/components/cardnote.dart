@@ -1,14 +1,17 @@
+import 'package:course_getx/app/model/notemodel.dart';
+import 'package:course_getx/constant/linkapi.dart';
 import 'package:flutter/material.dart';
 
 class CardNotes extends StatelessWidget {
   final void Function() ontap;
-  final String title;
-  final String content;
+  final NoteMode notemodel;
+  final Function()? onDelete;
   const CardNotes({
     super.key,
     required this.ontap,
-    required this.title,
-    required this.content,
+    required this.notemodel,
+
+    required this.onDelete,
   });
 
   @override
@@ -25,8 +28,8 @@ class CardNotes extends StatelessWidget {
             children: [
               Expanded(
                 flex: 1,
-                child: Image.asset(
-                  "images/logo.jpg",
+                child: Image.network(
+                  "$linkImageRoot/${notemodel.notesImage}",
                   width: 100,
                   height: 100,
                   fit: BoxFit.fill,
@@ -36,9 +39,13 @@ class CardNotes extends StatelessWidget {
                 flex: 2,
                 child: ListTile(
                   // ignore: unnecessary_string_interpolations
-                  title: Text("$title"),
+                  title: Text("${notemodel.notesTitle}"),
                   // ignore: unnecessary_string_interpolations
-                  subtitle: Text("$content"),
+                  subtitle: Text("${notemodel.notesTitle}"),
+                  trailing: IconButton(
+                    onPressed: onDelete,
+                    icon: Icon(Icons.delete),
+                  ),
                 ),
               ),
             ],
